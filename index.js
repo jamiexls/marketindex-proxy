@@ -3,7 +3,7 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 
 const app = express();
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT;
 
 app.get("/asx/:symbol", async (req, res) => {
   const symbol = req.params.symbol.toLowerCase();
