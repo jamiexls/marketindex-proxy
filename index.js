@@ -19,18 +19,24 @@ app.get("/asx/:symbol", async (req, res) => {
 
     const $ = cheerio.load(response.data);
 
-    const getText = (selector) => $(selector).first().text().trim() || "N/A";
+    const getData = (label) =>
+      $(`th:contains("${label}")`)
+        .next("td")
+        .find("span")
+        .first()
+        .text()
+        .trim() || "N/A";
 
     const data = {
-      name: getText("h1"), 
-      price: getText(".price"),
-      marketCap: getText("th:contains('Market Cap') + td"),
-      peRatio: getText("th:contains('P/E Ratio') + td"),
-      yield: getText("th:contains('Dividend Yield') + td"),
-      sector: getText("th:contains('Sector') + td"),
-      sharesOnIssue: getText("th:contains('Shares on Issue') + td"),
-      week52Range: getText("th:contains('52 Week Range') + td"),
-      oneYearReturn: getText("th:contains('1 Year Return') + td")
+      name: $("h1").first().text().trim(),
+      price: $("dl.dl-horizontal dd").first().text().trim() || "N/A", // Adjusted: fallback method
+      marketCap: getData("Market Cap"),
+      peRatio: getData("P/E Ratio"),
+      yield: getData("Dividend Yield"),
+      sector: getData("Sector"),
+      sharesOnIssue: getData("Shares on Issue"),
+      week52Range: getData("52 Week Range"),
+      oneYearReturn: getData("1 Year Return")
     };
 
     res.json(data);
@@ -38,6 +44,10 @@ app.get("/asx/:symbol", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Fetch failed", message: error.message });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Proxy running at http://localhost:${PORT}`);
 });
 
 app.listen(PORT, () => {
